@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ES2015",
+    "declaration": true,
+    "moduleResolution": "Node",
+    "outDir": "./dist"
+  },
+  "include": ["src/**/*.ts"]
+}
