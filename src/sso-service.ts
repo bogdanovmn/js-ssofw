@@ -35,7 +35,7 @@ export class SsoService {
     public async refreshToken(): Promise<void> {
         return axios.put<Jwt>(
             this.url + "/jwt",
-            { refreshToken: tokenStorage.getRefreshToken() }
+            { refreshToken: tokenStorage.refreshToken }
         ).then(
             response => tokenStorage.updateTokens(response.data)
         ).catch((error: any) => {
