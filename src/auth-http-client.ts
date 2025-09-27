@@ -41,6 +41,14 @@ export class AuthHttpClient {
                                     throw error
                                 })
                         })
+                        .catch((refreshError: any) => {
+                            console.log("Failed to refresh token, clearing storage")
+                            tokenStorage.clear()
+                            if (this.onFailAction) {
+                                this.onFailAction()
+                            }
+                            throw refreshError
+                        })
                 } else {
                     throw error
                 }
