@@ -21,8 +21,24 @@ export class AuthHttpClient {
         this.onFailAction = onFailFunction;
     }
 
-    async get<ResponseType>(url: string): Promise<ResponseType> {
-        return this.httpRequest<ResponseType>(() => this.directHttpRequest<ResponseType>("GET", url))
+    async makeRequest<ResponseType>(requestParams: Record<string, unknown>): Promise<ResponseType> {
+        return this.httpRequest<ResponseType>(() => this.directHttpRequest<ResponseType>(requestParams))
+    }
+
+    async get<ResponseType>(url: string, params: Record<string, unknown> = {}): Promise<ResponseType> {
+        return this.makeRequest<ResponseType>({ method: "GET", url, params })
+    }
+
+    async post<ResponseType>(url: string, params: Record<string, unknown> = {}): Promise<ResponseType> {
+        return this.makeRequest<ResponseType>({ method: "POST", url, data: params })
+    }
+
+    async put<ResponseType>(url: string, params: Record<string, unknown> = {}): Promise<ResponseType> {
+        return this.makeRequest<ResponseType>({ method: "PUT", url, data: params })
+    }
+
+    async delete<ResponseType>(url: string, params: Record<string, unknown> = {}): Promise<ResponseType> {
+        return this.makeRequest<ResponseType>({ method: "DELETE", url, params })
     }
 
     private async httpRequest<ResponseType>(requestFunction: () => Promise<ResponseType>): Promise<ResponseType> {
@@ -66,11 +82,10 @@ export class AuthHttpClient {
             })
     }
 
-    private async directHttpRequest<ResponseType>(method: string, url: string): Promise<ResponseType> {
-        let resp = axios<ResponseType>({
-            method: method,
-            url: url,
-            headers: tokenStorage.header()
+    private async directHttpRequest<ResponseType>(requestParams: Record<string, unknown>): Promise<ResponseType> {
+        const resp = axios<ResponseType>({
+            ...requestParams,
+            ...{ headers: tokenStorage.header() }
         })
         return (await resp).data
     }
