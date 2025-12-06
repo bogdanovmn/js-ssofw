@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosInstance } from 'axios'
 import { SsoService } from './sso-service'
 import { tokenStorage } from './token-storage'
 
@@ -15,8 +15,12 @@ class UnauthenticatedError extends Error {
 export class AuthHttpClient {
     private ssoService: SsoService
     private onFailAction: Function;
+    private axiosInstance: AxiosInstance
 
-    constructor( ssoService: SsoService, onFailFunction: Function = () => {}) {
+    constructor(apiBaseUrl: string, ssoService: SsoService, onFailFunction: Function = () => {}) {
+        this.axiosInstance = axios.create({
+            baseURL: apiBaseUrl
+        })
         this.ssoService = ssoService
         this.onFailAction = onFailFunction;
     }
@@ -83,11 +87,13 @@ export class AuthHttpClient {
     }
 
     private async directHttpRequest<ResponseType>(requestParams: Record<string, unknown>): Promise<ResponseType> {
-        const resp = axios<ResponseType>({
+        return this.axiosInstance<ResponseType>({
             ...requestParams,
             ...{ headers: tokenStorage.header() }
-        })
-        return (await resp).data
+        }).then(
+            resp => resp.data
+        )
+        
     }
 
     private errorResponseMessage(error: any): string {
