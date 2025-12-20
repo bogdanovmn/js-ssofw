@@ -49,6 +49,20 @@ export class SsoService {
         })
     }
 
+    public async exchangeJwtToCode(): Promise<string> {
+        return axios.put<TemporaryCodeResponse>(
+            this.url + "/sso/jwt",
+            {},
+            { headers: tokenStorage.header()}
+        ).then(
+            response => response.data.code
+        ).catch((error: any) => {
+            console.log(`Can't get temporary code using jwt"`)
+            console.log(error)
+            throw(error)
+        })
+    }
+
     public async exchangeCodeToJwt(temporaryCode: string): Promise<void> {
         return axios.get<Jwt>(
             this.url + "/sso/jwt",
